@@ -1,24 +1,19 @@
-name: Release Notes
+name: Release-Notes-Preview
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build:
-
+  preview:
     runs-on: windows-latest
-
     steps:
     - uses: actions/checkout@v2
-    - name: Extract release notes
-      id: extract_release_notes
-      uses: ffurrer2/extract-release-notes@v1
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - run: |
+        git fetch --prune --unshallow --tags
+    - uses: snyk/release-notes-preview@v1.6.1
       with:
-          body: ${{ steps.extract_release_notes.outputs.release_notes }}
+        releaseBranch: master
+      env:
+        GITHUB_PR_USERNAME: ${{ github.actor }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
